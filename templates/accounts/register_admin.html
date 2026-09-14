@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block title %}Admin Registration{% endblock %}
+{% block content %}
+<div class="container">
+    <h2 class="section-title text-center" style="display:block;text-align:center;">Create Admin / Instructor Account</h2>
+    <form method="post" class="styled-form">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-success" style="width:100%;">Register</button>
+        <p class="text-center mt-20">
+            Already have an account? <a href="{% url 'admin_login' %}" style="color:var(--blue);font-weight:600;">Login</a>
+        </p>
+    </form>
+</div>
+{% endblock %}

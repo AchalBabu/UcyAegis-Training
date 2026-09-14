@@ -1,0 +1,54 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Ucyaegis Training{% endblock %}</title>
+    <link rel="icon" href="{% static 'logo.jpeg' %}">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+
+<nav class="navbar">
+    <a href="{% url 'home' %}" class="brand">
+        <img src="{% static 'logo.jpeg' %}" alt="Ucyaegis Logo">
+        <span>Ucyaegis Training</span>
+    </a>
+    <div class="nav-links">
+        <a href="{% url 'home' %}">Courses</a>
+        {% if user.is_authenticated %}
+            {% if user.role == 'student' %}
+                <a href="{% url 'student_dashboard' %}">My Dashboard</a>
+                <a href="{% url 'payment_history' %}">Payment History</a>
+            {% elif user.role == 'admin' or user.is_superuser %}
+                <a href="{% url 'admin_dashboard' %}">Admin Dashboard</a>
+            {% endif %}
+            <span style="color:#cfe0ff;">Hi, {{ user.username }}</span>
+            <form action="{% url 'logout' %}" method="get" style="display:inline;">
+                <button type="submit">Logout</button>
+            </form>
+        {% else %}
+            <a href="{% url 'student_login' %}">Student Login</a>
+        {% endif %}
+    </div>
+</nav>
+
+{% if messages %}
+<div class="messages">
+    {% for message in messages %}
+        <div class="msg {{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<main>
+    {% block content %}{% endblock %}
+</main>
+
+<footer>
+    &copy; {% now "Y" %} Ucyaegis Training. All rights reserved.
+</footer>
+
+</body>
+</html>

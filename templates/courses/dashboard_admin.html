@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block title %}Admin Dashboard{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="flex-between">
+        <h2 class="section-title">Admin Dashboard</h2>
+        <a href="{% url 'course_create' %}" class="btn btn-success">+ Create New Course</a>
+    </div>
+
+    <div class="dashboard-stats">
+        <div class="stat-box">
+            <div class="num">{{ courses|length }}</div>
+            <div class="label">Your Courses</div>
+        </div>
+        <div class="stat-box">
+            <div class="num">{{ total_students }}</div>
+            <div class="label">Total Enrolled Students</div>
+        </div>
+        <div class="stat-box">
+            <div class="num">₹{{ total_revenue }}</div>
+            <div class="label">Total Revenue</div>
+        </div>
+    </div>
+
+    <h3 style="color:var(--navy);">Your Courses</h3>
+    <table class="styled-table">
+        <thead>
+            <tr><th>Title</th><th>Price</th><th>Lectures</th><th>Published</th><th>Actions</th></tr>
+        </thead>
+        <tbody>
+        {% for course in courses %}
+            <tr>
+                <td>{{ course.title }}</td>
+                <td>{% if course.is_free %}Free{% else %}₹{{ course.price }}{% endif %}</td>
+                <td>{{ course.lecture_count }}</td>
+                <td>{% if course.is_published %}Yes{% else %}No{% endif %}</td>
+                <td>
+                    <a href="{% url 'lecture_create' course.id %}" style="color:var(--blue);">Manage Lectures</a> |
+                    <a href="{% url 'course_edit' course.id %}" style="color:var(--blue);">Edit</a> |
+                    <a href="{% url 'admin_course_students' course.id %}" style="color:var(--blue);">Students</a> |
+                    <a href="{% url 'course_delete' course.id %}" style="color:var(--danger);">Delete</a>
+                </td>
+            </tr>
+        {% empty %}
+            <tr><td colspan="5">You haven't created any courses yet.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block title %}Students - {{ course.title }}{% endblock %}
+{% block content %}
+<div class="container">
+    <h2 class="section-title">Enrolled Students - {{ course.title }}</h2>
+    <table class="styled-table">
+        <thead><tr><th>Student</th><th>Email</th><th>Enrolled On</th></tr></thead>
+        <tbody>
+        {% for e in enrollments %}
+            <tr>
+                <td>{{ e.student.username }}</td>
+                <td>{{ e.student.email }}</td>
+                <td>{{ e.enrolled_at|date:"d M Y, h:i A" }}</td>
+            </tr>
+        {% empty %}
+            <tr><td colspan="3">No students enrolled yet.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <div class="text-center mt-20">
+        <a href="{% url 'admin_dashboard' %}" class="btn btn-outline">Back to Dashboard</a>
+    </div>
+</div>
+{% endblock %}

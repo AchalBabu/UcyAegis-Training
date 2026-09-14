@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Ucyaegis Training - Home{% endblock %}
+{% block content %}
+
+<div class="hero">
+    <img src="{% static 'logo.jpeg' %}" class="logo-hero" alt="Ucyaegis Logo">
+    <h1>Ucyaegis Training</h1>
+    <p>Learn from recorded expert lectures. Enroll, pay securely, and start learning instantly.</p>
+    {% if not user.is_authenticated %}
+    <div class="mt-20">
+        <a href="{% url 'student_register' %}" class="btn btn-success">Join as Student</a>
+    </div>
+    {% endif %}
+</div>
+
+<div class="container">
+    <h2 class="section-title">Available Courses</h2>
+    <div class="card-grid">
+        {% for course in courses %}
+        <div class="card">
+            {% if course.thumbnail %}
+                <img src="{{ course.thumbnail.url }}" class="thumb" alt="{{ course.title }}">
+            {% else %}
+                <img src="{% static 'logo.jpeg' %}" class="thumb" alt="{{ course.title }}" style="object-fit:contain;background:#e8f0fe;">
+            {% endif %}
+            <div class="card-body">
+                <h3>{{ course.title }}</h3>
+                <p>{{ course.description|truncatewords:20 }}</p>
+                <div class="price-tag">
+                    {% if course.is_free %}Free{% else %}₹{{ course.price }}{% endif %}
+                </div>
+                <a href="{% url 'course_detail' course.slug %}" class="btn btn-primary">View Course</a>
+            </div>
+        </div>
+        {% empty %}
+        <p>No courses available yet. Please check back soon!</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

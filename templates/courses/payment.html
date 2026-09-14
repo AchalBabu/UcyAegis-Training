@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Pay via UPI - {{ course.title }}{% endblock %}
+{% block content %}
+<div class="container">
+    <h2 class="section-title text-center" style="display:block;text-align:center;">Pay via UPI</h2>
+
+    <div class="styled-form">
+        <h3 style="color:var(--navy);margin-top:0;">{{ course.title }}</h3>
+        <p>{{ course.description|truncatewords:25 }}</p>
+        <hr>
+        <div class="flex-between">
+            <span>Course Price</span>
+            <strong>₹{{ course.price }}</strong>
+        </div>
+        <div class="flex-between mt-20" style="font-size:18px;">
+            <span>Total Payable</span>
+            <strong style="color:var(--blue);">₹{{ course.price }}</strong>
+        </div>
+
+        <button id="rzp-pay-btn" class="btn btn-success mt-20" style="width:100%;">
+            Pay ₹{{ course.price }} via UPI
+        </button>
+        <p id="rzp-status" style="text-align:center;margin-top:12px;font-size:14px;"></p>
+
+        <p style="font-size:12px;color:#888;margin-top:14px;text-align:center;">
+            Secured by Razorpay. Course unlocks INSTANTLY and automatically the moment your UPI payment is verified — no waiting, no admin approval needed.
+        </p>
+    </div>
+</div>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+    document.getElementById('rzp-pay-btn').onclick = function (e) {
+        e.preventDefault();
+        var statusEl = document.getElementById('rzp-status');
+        statusEl.textContent = '';
+
+        var options = {
+            "key": "{{ razorpay_key_id }}",
+            "amount": "{{ amount_in_paise }}",
+            "currency": "INR",
+            "name": "Ucyaegis Training",
+            "description": "{{ course.title|escapejs }}",
+            "image": "{% static 'logo.jpeg' %}",
+            "order_id": "{{ razorpay_order_id }}",
+            "prefill": {
+                "name": "{{ student_name|escapejs }}",
+                "email": "{{ student_email|escapejs }}",
+                "method": "upi"
+            },
+            // Restrict checkout to show ONLY UPI as a payment option
+            // (no cards, no netbanking, no wallets).
+            "config": {
+                "display": {
+                    "blocks": {
+                        "upi_only": {
+                            "name": "Pay via UPI",
+                            "instruments": [
+                                { "method": "upi" }
+                            ]
+                        }
+                    },
+                    "sequence": ["block.upi_only"],
+                    "preferences": { "show_default_blocks": false }
+                }
+            },
+            "theme": { "color": "#142850" },
+            "handler": function (response) {
+                statusEl.textContent = 'Verifying your payment...';
+                var formData = new FormData();
+                formData.append('razorpay_payment_id', response.razorpay_payment_id);
+                formData.append('razorpay_order_id', response.razorpay_order_id);
+                formData.append('razorpay_signature', response.razorpay_signature);
+                formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+
+                fetch("{% url 'verify_payment' payment.id %}", {
+                    method: "POST",
+                    body: formData
+                })
+                .then(function (res) { return res.json(); })
+                .then(function (data) {
+                    if (data.status === 'success') {
+                        statusEl.style.color = 'green';
+                        statusEl.textContent = 'Payment verified! Unlocking your course...';
+                        window.location.href = data.redirect_url;
+                    } else {
+                        statusEl.style.color = 'red';
+                        statusEl.textContent = 'Payment verification failed. Please contact support.';
+                    }
+                })
+                .catch(function () {
+                    statusEl.style.color = 'red';
+                    statusEl.textContent = 'Something went wrong while verifying payment.';
+                });
+            },
+            "modal": {
+                "ondismiss": function () {
+                    window.location.href = "{% url 'payment_cancelled' payment.id %}";
+                }
+            }
+        };
+
+        var rzp = new Razorpay(options);
+        rzp.on('payment.failed', function (response) {
+            statusEl.style.color = 'red';
+            statusEl.textContent = 'Payment failed: ' + response.error.description;
+        });
+        rzp.open();
+    };
+</script>
+{% endblock %}

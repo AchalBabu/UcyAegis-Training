@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}My Dashboard{% endblock %}
+{% block content %}
+<div class="container">
+    <h2 class="section-title">My Enrolled Courses</h2>
+    <div class="card-grid">
+        {% for e in enrollments %}
+        <div class="card">
+            {% if e.course.thumbnail %}
+                <img src="{{ e.course.thumbnail.url }}" class="thumb">
+            {% else %}
+                <img src="{% static 'logo.jpeg' %}" class="thumb" style="object-fit:contain;background:#e8f0fe;">
+            {% endif %}
+            <div class="card-body">
+                <h3>{{ e.course.title }}</h3>
+                <p>{{ e.course.lecture_count }} lecture(s)</p>
+                <a href="{% url 'watch_course' e.course.slug %}" class="btn btn-success">Continue Learning</a>
+            </div>
+        </div>
+        {% empty %}
+        <p>You are not enrolled in any course yet.</p>
+        {% endfor %}
+    </div>
+
+    <h2 class="section-title mt-20">Available Courses</h2>
+    <div class="card-grid">
+        {% for course in available_courses %}
+        <div class="card">
+            {% if course.thumbnail %}
+                <img src="{{ course.thumbnail.url }}" class="thumb">
+            {% else %}
+                <img src="{% static 'logo.jpeg' %}" class="thumb" style="object-fit:contain;background:#e8f0fe;">
+            {% endif %}
+            <div class="card-body">
+                <h3>{{ course.title }}</h3>
+                <p>{{ course.description|truncatewords:15 }}</p>
+                <div class="price-tag">{% if course.is_free %}Free{% else %}₹{{ course.price }}{% endif %}</div>
+                <a href="{% url 'course_detail' course.slug %}" class="btn btn-primary">View & Enroll</a>
+            </div>
+        </div>
+        {% empty %}
+        <p>No new courses to show right now.</p>
+        {% endfor %}
+    </div>
+
+    <div class="text-center mt-20" style="border-top:1px solid #ddd;padding-top:20px;">
+        <a href="{% url 'delete_account' %}" style="color:var(--danger);font-size:14px;">Delete My Account</a>
+    </div>
+</div>
+{% endblock %}

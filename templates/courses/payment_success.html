@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block title %}Payment Successful{% endblock %}
+{% block content %}
+<div class="container text-center">
+    <h2 style="color:var(--success);font-size:32px;">✅ Payment Successful!</h2>
+    <p>Transaction ID: <strong>{{ payment.transaction_id }}</strong></p>
+    <p>Amount Paid: <strong>₹{{ payment.amount }}</strong></p>
+    <p>You are now enrolled in <strong>{{ payment.course.title }}</strong>.</p>
+    <a href="{% url 'watch_course' payment.course.slug %}" class="btn btn-success mt-20">Start Learning Now</a>
+</div>
+{% endblock %}

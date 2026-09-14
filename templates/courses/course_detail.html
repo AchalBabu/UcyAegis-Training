@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}{{ course.title }}{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="flex-between">
+        <h2 class="section-title">{{ course.title }}</h2>
+        <div class="price-tag">{% if course.is_free %}Free{% else %}₹{{ course.price }}{% endif %}</div>
+    </div>
+
+    {% if course.thumbnail %}
+        <img src="{{ course.thumbnail.url }}" style="width:100%;max-height:320px;object-fit:cover;border-radius:10px;margin-bottom:20px;">
+    {% endif %}
+
+    <p style="font-size:16px;line-height:1.6;">{{ course.description }}</p>
+
+    <h3 style="color:var(--navy);margin-top:30px;">Lectures ({{ lectures|length }})</h3>
+    <ul class="lecture-list">
+        {% for lecture in lectures %}
+        <li>
+            <span>{{ forloop.counter }}. {{ lecture.title }}</span>
+            {% if is_enrolled or course.is_free %}
+                <span class="badge badge-unlocked">Unlocked</span>
+            {% else %}
+                <span class="badge badge-locked">Locked</span>
+            {% endif %}
+        </li>
+        {% empty %}
+        <p>No lectures uploaded yet.</p>
+        {% endfor %}
+    </ul>
+
+    <div class="mt-20 text-center">
+        {% if user.is_authenticated and user.role == 'student' %}
+            {% if is_enrolled %}
+                <a href="{% url 'watch_course' course.slug %}" class="btn btn-success">Go to Course</a>
+            {% else %}
+                <a href="{% url 'initiate_payment' course.id %}" class="btn btn-primary">
+                    {% if course.is_free %}Enroll for Free{% else %}Enroll Now - ₹{{ course.price }}{% endif %}
+                </a>
+            {% endif %}
+        {% elif not user.is_authenticated %}
+            <a href="{% url 'student_login' %}" class="btn btn-primary">Login as Student to Enroll</a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

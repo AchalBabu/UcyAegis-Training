@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block title %}Delete Account{% endblock %}
+{% block content %}
+<div class="container text-center">
+    <h2 class="section-title" style="color:var(--danger);border-color:var(--danger);">Delete Your Account</h2>
+    <p style="font-size:16px;">Are you sure, <strong>{{ user.username }}</strong>? This will permanently delete:</p>
+    <ul style="list-style:none;padding:0;color:#555;">
+        <li>✔ Your login/account details</li>
+        <li>✔ All your course enrollments</li>
+        <li>✔ Your payment history</li>
+    </ul>
+    <p style="color:var(--danger);font-weight:600;">This action CANNOT be undone.</p>
+    <form method="post" class="mt-20">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Yes, Permanently Delete My Account</button>
+        <a href="{% url 'student_dashboard' %}" class="btn btn-outline">Cancel</a>
+    </form>
+</div>
+{% endblock %}
