@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Certificates{% endblock %}
+{% block content %}
+<div class="container" style="max-width:900px;">
+
+    <h2 class="section-title">🎓 Certificates</h2>
+
+    <div class="panel">
+        <h3>➕ Create Certificate</h3>
+        <p class="muted">Manually enter the credential ID and upload the final certificate.</p>
+        <form method="POST" enctype="multipart/form-data" class="styled-form">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-success">Create Certificate</button>
+        </form>
+    </div>
+
+    <div class="panel">
+        <h3>Issued Certificates ({{ certificates|length }})</h3>
+
+        {% for certificate in certificates %}
+        <div class="item-card" style="--i:{{ forloop.counter0 }}">
+            <div class="item-top">
+                <div>
+                    <h4>{{ certificate.student.get_full_name|default:certificate.student.username }}</h4>
+                    <p class="muted" style="margin:4px 0 0;">{{ certificate.course.title }} · Issued {{ certificate.issued_at|date:"d M Y" }}</p>
+                    <span class="code-chip">{{ certificate.credential_id }}</span>
+                </div>
+                <div class="row-actions">
+                    {% if certificate.certificate_file %}<a href="{{ certificate.certificate_file.url }}" target="_blank">📄 View</a>{% endif %}
+                    <a href="{% url 'verify_credential' %}?credential={{ certificate.credential_id }}">✔ Verify</a>
+                    <a href="{% url 'certificate_delete' certificate.id %}" class="danger">🗑 Delete</a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="qa-box text-center" style="margin-top:16px;padding:26px;">No certificates created yet.</div>
+        {% endfor %}
+    </div>
+
+    <div class="text-center mt-20">
+        <a href="{% url 'admin_dashboard' %}" class="btn btn-outline">← Back to Dashboard</a>
+    </div>
+</div>
+{% endblock %}

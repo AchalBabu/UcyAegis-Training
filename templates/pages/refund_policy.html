@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block title %}Refund Policy - Ucyaegis Training{% endblock %}
+{% block content %}
+<div class="container legal">
+    {% include 'pages/_legal_nav.html' with tab='refund' %}
+    <article class="legal-doc">
+        <h1>Refund Policy</h1>
+        <p class="updated">Last updated: 3 October 2026</p>
+
+        <p>Thank you for learning with Ucyaegis Training. Our courses are digital, pre-recorded learning content and access is given immediately after successful payment. Please read this policy before purchasing a course.</p>
+
+        <h2>1. Digital content</h2>
+        <p>Because course videos and resources become available as soon as you enroll, payments for courses are generally <strong>non-refundable</strong> once access has been granted.</p>
+
+        <h2>2. When a refund can be requested</h2>
+        <ul>
+            <li>You were charged more than once for the same course (duplicate payment).</li>
+            <li>Your payment was deducted but you were not enrolled in the course.</li>
+            <li>A technical problem on our side prevented you from accessing the course and we were unable to resolve it.</li>
+        </ul>
+
+        <h2>3. When a refund is not available</h2>
+        <ul>
+            <li>You changed your mind after accessing lectures or resources.</li>
+            <li>You completed the course or a certificate has been issued.</li>
+            <li>Your account was suspended for violating our <a href="{% url 'terms' %}">Terms &amp; Conditions</a>.</li>
+            <li>The course was free.</li>
+        </ul>
+
+        <h2>4. How to request a refund</h2>
+        <p>Contact us through <a href="https://ucyaegis.pro" target="_blank" rel="noopener">ucyaegis.pro</a> within <strong>7 days</strong> of the payment. Please include your registered username, the course name and your Transaction ID.</p>
+
+        <h2>5. Processing time</h2>
+        <p>Approved refunds are returned to the original payment method. It usually takes <strong>5–7 working days</strong> for the amount to reflect, depending on your bank or UPI app.</p>
+
+        <h2>6. Changes to this policy</h2>
+        <p>We may update this policy from time to time. The latest version will always be available on this page.</p>
+
+        <p class="legal-contact">Questions? <a href="{% url 'contact' %}">Contact us</a>.</p>
+    </article>
+</div>
+{% endblock %}

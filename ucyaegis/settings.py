@@ -111,3 +111,12 @@ LOGOUT_REDIRECT_URL = '/'
 RAZORPAY_KEY_ID = 'rzp_test_TbpQFMCkCQzrDi'       # <-- put your Key Id here
 RAZORPAY_KEY_SECRET = 'nJhbhRJjvD2OvpVUDLMzX0np'      # <-- put your Key Secret here
 
+# ---------------------------------------------------------------------------
+# FREE DEMO ACCESS
+# ---------------------------------------------------------------------------
+# Non-subscribed (not enrolled / not paid) students can watch only the first
+# N lectures of a PAID course as a free demo. Everything after that is
+# locked until they pay / subscribe. Free courses are always fully open.
+# ---------------------------------------------------------------------------
+FREE_PREVIEW_LECTURES = 2
+

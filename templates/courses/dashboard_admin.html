@@ -2,49 +2,78 @@
 {% block title %}Admin Dashboard{% endblock %}
 {% block content %}
 <div class="container">
-    <div class="flex-between">
+    <div class="flex-between" style="margin-bottom:10px;">
         <h2 class="section-title">Admin Dashboard</h2>
-        <a href="{% url 'course_create' %}" class="btn btn-success">+ Create New Course</a>
+        <div class="row-actions">
+            <a href="{% url 'admin_questions' %}">💬 Student Questions</a>
+            <a href="{% url 'create_certificate' %}">🎓 Certificates</a>
+            <a href="{% url 'course_create' %}" class="btn btn-success btn-sm" style="color:#fff;background:var(--grad-ok);">+ Create New Course</a>
+        </div>
     </div>
 
     <div class="dashboard-stats">
-        <div class="stat-box">
-            <div class="num">{{ courses|length }}</div>
-            <div class="label">Your Courses</div>
+        <div class="stat-box reveal" style="--i:0">
+            <div class="stat-icon">📘</div>
+            <div><div class="num" data-count="{{ courses|length }}">0</div><div class="label">Your Courses</div></div>
         </div>
-        <div class="stat-box">
-            <div class="num">{{ total_students }}</div>
-            <div class="label">Total Enrolled Students</div>
+        <div class="stat-box reveal" style="--i:1">
+            <div class="stat-icon">👩‍🎓</div>
+            <div><div class="num" data-count="{{ total_students }}">0</div><div class="label">Enrolled Students</div></div>
         </div>
-        <div class="stat-box">
-            <div class="num">₹{{ total_revenue }}</div>
-            <div class="label">Total Revenue</div>
+        <div class="stat-box reveal" style="--i:2">
+            <div class="stat-icon">📈</div>
+            <div><div class="num" data-count="{{ overall_avg }}" data-suffix="%">0</div><div class="label">Avg. Student Progress</div></div>
+        </div>
+        <div class="stat-box reveal" style="--i:3">
+            <div class="stat-icon">🏆</div>
+            <div><div class="num" data-count="{{ completed_total }}">0</div><div class="label">Course Completions</div></div>
+        </div>
+        <div class="stat-box reveal" style="--i:4">
+            <div class="stat-icon">💰</div>
+            <div><div class="num" data-count="{{ total_revenue|floatformat:0 }}" data-prefix="₹">0</div><div class="label">Total Revenue</div></div>
         </div>
     </div>
 
     <h3 style="color:var(--navy);">Your Courses</h3>
+    <div class="table-wrap">
     <table class="styled-table">
         <thead>
-            <tr><th>Title</th><th>Price</th><th>Lectures</th><th>Published</th><th>Actions</th></tr>
+            <tr><th>Title</th><th>Price</th><th>Lectures</th><th style="min-width:200px;">Student Progress</th><th>Published</th><th>Actions</th></tr>
         </thead>
         <tbody>
         {% for course in courses %}
-            <tr>
-                <td>{{ course.title }}</td>
-                <td>{% if course.is_free %}Free{% else %}₹{{ course.price }}{% endif %}</td>
+            <tr style="--i:{{ forloop.counter0 }}">
+                <td><strong>{{ course.title }}</strong></td>
+                <td>{% if course.is_free %}<span class="badge badge-unlocked">Free</span>{% else %}₹{{ course.price }}{% endif %}</td>
                 <td>{{ course.lecture_count }}</td>
-                <td>{% if course.is_published %}Yes{% else %}No{% endif %}</td>
                 <td>
-                    <a href="{% url 'lecture_create' course.id %}" style="color:var(--blue);">Manage Lectures</a> |
-                    <a href="{% url 'course_edit' course.id %}" style="color:var(--blue);">Edit</a> |
-                    <a href="{% url 'admin_course_students' course.id %}" style="color:var(--blue);">Students</a> |
-                    <a href="{% url 'course_delete' course.id %}" style="color:var(--danger);">Delete</a>
+                    {% if course.overview.students %}
+                        <div class="progress {% if course.overview.avg_percent == 100 %}done{% endif %}" style="--p: {{ course.overview.avg_percent }}"><div class="progress-fill"></div></div>
+                        <div class="progress-meta">
+                            <span><b>{{ course.overview.avg_percent }}%</b> avg</span>
+                            <span>{{ course.overview.completed }}/{{ course.overview.students }} finished</span>
+                        </div>
+                    {% else %}
+                        <span class="muted">No students yet</span>
+                    {% endif %}
+                </td>
+                <td>{% if course.is_published %}<span class="badge badge-unlocked">Yes</span>{% else %}<span class="badge badge-idle">No</span>{% endif %}</td>
+                <td>
+                    <div class="row-actions">
+                        <a href="{% url 'lecture_create' course.id %}">Lectures</a>
+                        <a href="{% url 'assignment_manage' course.id %}">Assignments</a>
+                        <a href="{% url 'course_resources' course.id %}">Resources</a>
+                        <a href="{% url 'admin_course_students' course.id %}">Students</a>
+                        <a href="{% url 'course_edit' course.id %}">Edit</a>
+                        <a href="{% url 'course_delete' course.id %}" class="danger">Delete</a>
+                    </div>
                 </td>
             </tr>
         {% empty %}
-            <tr><td colspan="5">You haven't created any courses yet.</td></tr>
+            <tr><td colspan="6">You haven't created any courses yet.</td></tr>
         {% endfor %}
         </tbody>
     </table>
+    </div>
 </div>
 {% endblock %}

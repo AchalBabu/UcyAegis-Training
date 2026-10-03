@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block title %}Edit Resource - {{ resource.title }}{% endblock %}
+{% block content %}
+<div class="container">
+    <h2 class="section-title text-center" style="display:block;text-align:center;">✏️ Edit Resource</h2>
+    <p class="text-center muted">Course: <strong>{{ course.title }}</strong></p>
+
+    <form method="post" enctype="multipart/form-data" class="styled-form">
+        {% csrf_token %}
+        <div class="msg info inline" style="font-size:13px;">
+            Current file: <a href="{{ resource.file.url }}" target="_blank"><strong>{{ resource.file.name|cut:'course_resources/' }}</strong></a>
+        </div>
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-success" style="width:100%;">Save Changes</button>
+        <a href="{% url 'course_resources' course.id %}" class="btn btn-outline" style="width:100%;margin-top:10px;">Cancel</a>
+    </form>
+</div>
+{% endblock %}

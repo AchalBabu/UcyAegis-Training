@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Issue Certificate{% endblock %}
+{% block content %}
+<div class="container">
+
+    <form method="POST" enctype="multipart/form-data" class="styled-form" style="max-width:640px;">
+        {% csrf_token %}
+        <h2 style="margin-top:0;color:var(--navy);">🎓 {% if existing_certificate %}Update{% else %}Issue{% endif %} Certificate</h2>
+        <p class="muted">Upload the student's final certificate and enter the Credential ID printed on it.</p>
+
+        <div class="qa-box" style="margin-bottom:20px;">
+            <strong>Student:</strong> {{ student.username }}<br>
+            <strong>Course:</strong> {{ course.title }}
+        </div>
+
+        <p>
+            <label>Credential ID</label>
+            {{ form.credential_id }}
+            <small>Enter exactly the same Credential ID printed on the certificate.</small>
+        </p>
+        <p>
+            <label>Certificate File</label>
+            {{ form.certificate_file }}
+            <small>Upload the final certificate image or PDF.</small>
+        </p>
+
+        {% if form.errors %}<div class="errorlist" style="padding:12px;">{{ form.errors }}</div>{% endif %}
+
+        <button type="submit" class="btn btn-success" style="width:100%;">{% if existing_certificate %}Save Changes{% else %}Issue Certificate{% endif %}</button>
+    </form>
+
+    {% if existing_certificate %}
+    <div class="danger-box" style="max-width:640px;margin:24px auto 0;">
+        <div>
+            <strong>Already issued:</strong> <span class="code-chip">{{ existing_certificate.credential_id }}</span>
+            <p class="muted" style="margin:4px 0 0;">Issued {{ existing_certificate.issued_at|date:"d M Y" }}. You can update it above, or delete it.</p>
+        </div>
+        <a href="{% url 'certificate_delete' existing_certificate.id %}?from=students" class="btn btn-danger btn-sm">🗑 Delete Certificate</a>
+    </div>
+    {% endif %}
+
+    <div class="text-center mt-20">
+        <a href="{% url 'admin_course_students' course.id %}" class="btn btn-outline">← Back to Students</a>
+    </div>
+</div>
+{% endblock %}

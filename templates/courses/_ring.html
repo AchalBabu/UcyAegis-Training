@@ -1,0 +1,7 @@
+<div class="ring {{ size }}" style="--p: {{ percent }}" title="{{ percent }}% complete">
+    <svg viewBox="0 0 120 120" aria-hidden="true">
+        <circle class="ring-bg" cx="60" cy="60" r="52"/>
+        <circle class="ring-fg" cx="60" cy="60" r="52"/>
+    </svg>
+    <div class="ring-num"><span>{{ percent }}%{% if label %}<small>{{ label }}</small>{% endif %}</span></div>
+</div>

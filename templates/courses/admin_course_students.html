@@ -2,23 +2,69 @@
 {% block title %}Students - {{ course.title }}{% endblock %}
 {% block content %}
 <div class="container">
-    <h2 class="section-title">Enrolled Students - {{ course.title }}</h2>
+    <h2 class="section-title">Student Progress — {{ course.title }}</h2>
+
+    <div class="chip-row">
+        <span class="chip" style="--i:0">👩‍🎓 <b>{{ overview.students }}</b> students</span>
+        <span class="chip" style="animation-delay:.08s">📈 Avg progress <b>{{ overview.avg_percent }}%</b></span>
+        <span class="chip" style="animation-delay:.16s">🏆 Completed <b>{{ overview.completed }}</b></span>
+        <span class="chip" style="animation-delay:.24s">▶ In progress <b>{{ overview.in_progress }}</b></span>
+        <span class="chip" style="animation-delay:.32s">⏸ Not started <b>{{ overview.not_started }}</b></span>
+        {% if overview.certificates_pending %}<span class="chip" style="animation-delay:.4s;border-color:#fbbf24;background:#fffbeb;">⏳ Certificates to issue <b style="color:#b45309;">{{ overview.certificates_pending }}</b></span>{% endif %}
+    </div>
+
+    <div class="table-wrap">
     <table class="styled-table">
-        <thead><tr><th>Student</th><th>Email</th><th>Enrolled On</th></tr></thead>
+        <thead>
+            <tr>
+                <th>Student</th>
+                <th style="min-width:220px;">Progress</th>
+                <th>Status</th>
+                <th>Last Activity</th>
+                <th>Enrolled</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
         <tbody>
         {% for e in enrollments %}
-            <tr>
-                <td>{{ e.student.username }}</td>
-                <td>{{ e.student.email }}</td>
-                <td>{{ e.enrolled_at|date:"d M Y, h:i A" }}</td>
+            <tr style="--i:{{ forloop.counter0 }}">
+                <td>
+                    <div class="user-cell">
+                        <span class="avatar">{{ e.student.username|slice:":1" }}</span>
+                        <div><strong>{{ e.student.username }}</strong><br><span class="muted">{{ e.student.email }}</span></div>
+                    </div>
+                </td>
+                <td>
+                    {% include 'courses/_bar.html' with p=e.progress %}
+                    <div class="progress-meta">
+                        <span><b>{{ e.progress.percent }}%</b></span>
+                        <span>{{ e.progress.done_lectures }}/{{ e.progress.total_lectures }} lectures{% if e.progress.total_assignments %} · {{ e.progress.passed_assignments }}/{{ e.progress.total_assignments }} assignments{% endif %}</span>
+                    </div>
+                </td>
+                <td>
+                    {% if e.progress.status == 'completed' %}<span class="badge badge-done">✓ Completed</span>{% if e.certificate_pending %}<br><span class="badge badge-warn" style="margin-top:4px;">⏳ Certificate pending</span>{% endif %}
+                    {% elif e.progress.status == 'in_progress' %}<span class="badge badge-progress">In progress</span>
+                    {% else %}<span class="badge badge-idle">Not started</span>{% endif %}
+                </td>
+                <td>{% if e.progress.last_activity %}{{ e.progress.last_activity|timesince }} ago{% else %}<span class="muted">—</span>{% endif %}</td>
+                <td>{{ e.enrolled_at|date:"d M Y" }}</td>
+                <td>
+                    <div class="row-actions">
+                        <a href="{% url 'admin_student_progress' course.id e.student.id %}">📊 Details</a>
+                        <a href="{% url 'send_student_resource' course.id e.student.id %}">📎 Send File</a>
+                        <a href="{% url 'issue_certificate' course.id e.student.id %}" {% if e.certificate_pending %}style="background:var(--warn);color:#fff;"{% endif %}>🎓 {% if e.has_certificate %}Certificate{% else %}Issue Certificate{% endif %}</a>
+                    </div>
+                </td>
             </tr>
         {% empty %}
-            <tr><td colspan="3">No students enrolled yet.</td></tr>
+            <tr><td colspan="6">No students enrolled yet.</td></tr>
         {% endfor %}
         </tbody>
     </table>
+    </div>
+
     <div class="text-center mt-20">
-        <a href="{% url 'admin_dashboard' %}" class="btn btn-outline">Back to Dashboard</a>
+        <a href="{% url 'admin_dashboard' %}" class="btn btn-outline">← Back to Dashboard</a>
     </div>
 </div>
 {% endblock %}

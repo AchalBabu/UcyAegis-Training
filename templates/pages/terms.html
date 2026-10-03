@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block title %}Terms &amp; Conditions - Ucyaegis Training{% endblock %}
+{% block content %}
+<div class="container legal">
+    {% include 'pages/_legal_nav.html' with tab='terms' %}
+    <article class="legal-doc">
+        <h1>Terms &amp; Conditions</h1>
+        <p class="updated">Last updated: 3 October 2026</p>
+
+        <p>By creating an account or using Ucyaegis Training, you agree to these Terms &amp; Conditions. If you do not agree, please do not use the website.</p>
+
+        <h2>1. Your account</h2>
+        <p>You must provide correct information and keep your login details confidential. You are responsible for all activity under your account. Accounts are for one person only and must not be shared.</p>
+
+        <h2>2. Courses &amp; access</h2>
+        <p>When you enroll, you receive a personal, non-transferable licence to watch the course content for your own learning. Some lectures unlock only after you complete the previous lecture and pass its assignment.</p>
+
+        <h2>3. Acceptable use</h2>
+        <ul>
+            <li>Do not copy, record, download (except resources we allow), resell, share or publish lectures or course resources.</li>
+            <li>Do not share your account or try to bypass lecture locks, payments or security.</li>
+            <li>Do not post abusive, unlawful or misleading content in questions or any other field.</li>
+        </ul>
+
+        <h2>4. Payments</h2>
+        <p>Prices are shown in Indian Rupees (₹). Payments are processed securely through Razorpay. Please read our <a href="{% url 'refund_policy' %}">Refund Policy</a> before purchasing.</p>
+
+        <h2>5. Certificates</h2>
+        <p>A certificate is issued after you complete all lectures and pass all assignments of a course. It is normally made available within 2 hours of completion. Each certificate has a unique Credential ID that can be verified on our website. We may cancel a certificate if it was obtained unfairly.</p>
+
+        <h2>6. Intellectual property</h2>
+        <p>All videos, text, logos and resources on this website belong to Ucyaegis Training or its instructors and are protected by law.</p>
+
+        <h2>7. Suspension &amp; termination</h2>
+        <p>We may suspend or remove accounts that break these terms. You may delete your own account at any time from your Profile page.</p>
+
+        <h2>8. Disclaimer &amp; liability</h2>
+        <p>Courses are provided for educational purposes. We do not guarantee any particular job, income or exam result. To the extent permitted by law, our liability is limited to the amount you paid for the course concerned.</p>
+
+        <h2>9. Governing law</h2>
+        <p>These terms are governed by the laws of India.</p>
+
+        <h2>10. Changes</h2>
+        <p>We may update these terms from time to time. Continuing to use the website means you accept the updated terms.</p>
+
+        <p class="legal-contact">Questions? <a href="{% url 'contact' %}">Contact us</a>.</p>
+    </article>
+</div>
+{% endblock %}

@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+
+{% block title %}
+My Profile
+{% endblock %}
+
+{% block content %}
+
+<div
+    class="container"
+    style="max-width:800px;"
+>
+
+    <h2 class="section-title">
+        My Profile
+    </h2>
+
+
+    <div class="styled-form" style="max-width:none;">
+
+        <h3 style="color:var(--navy);">
+            {{ user.get_full_name|default:user.username }}
+        </h3>
+
+        <p>
+            <strong>Username:</strong>
+            {{ user.username }}
+        </p>
+
+        <p>
+            <strong>Email:</strong>
+            {{ user.email }}
+        </p>
+
+        {% if user.phone %}
+
+        <p>
+            <strong>Phone:</strong>
+            {{ user.phone }}
+        </p>
+
+        {% endif %}
+
+
+        <div
+            style="
+            border-top:1px solid #eee;
+            margin-top:20px;
+            padding-top:20px;
+            "
+        >
+
+            <a
+                href="{% url 'my_certificates' %}"
+                class="btn btn-success"
+            >
+                🎓 My Certificates
+            </a>
+
+            <a
+                href="{% url 'verify_credential' %}"
+                class="btn btn-outline"
+            >
+                Verify Credential
+            </a>
+
+        </div>
+
+        <div class="danger-box">
+            <div>
+                <strong>Delete my account</strong>
+                <p class="muted" style="margin:2px 0 0;">Permanently remove your account, progress and certificates.</p>
+            </div>
+            <a href="{% url 'delete_account' %}" class="btn btn-danger btn-sm">🗑 Delete Account</a>
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

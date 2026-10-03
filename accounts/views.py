@@ -78,19 +78,35 @@ def user_logout(request):
     logout(request)
     return redirect('home')
 
+@login_required
+def profile(request):
+
+    if request.user.role != 'student':
+        return redirect('home')
+
+    return render(
+        request,
+        'accounts/profile.html'
+    )
 
 @login_required
 def delete_account(request):
     """
     Lets a STUDENT permanently delete their own account.
-    Deleting the user also cascades and removes their Enrollments and
-    Payment records (see courses/models.py -> on_delete=models.CASCADE).
+    The student must type their password to confirm.
+    Deleting the user cascades and removes their enrollments, payments,
+    lecture progress, assignment submissions, questions and certificates.
     """
     if request.user.role != 'student':
         messages.error(request, 'Only student accounts can be deleted from here.')
         return redirect('home')
 
     if request.method == 'POST':
+        password = request.POST.get('password', '')
+        if not request.user.check_password(password):
+            messages.error(request, 'Incorrect password. Your account was NOT deleted.')
+            return render(request, 'accounts/confirm_delete_account.html')
+
         user = request.user
         logout(request)
         user.delete()

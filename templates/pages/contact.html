@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block title %}Contact Us - Ucyaegis Training{% endblock %}
+{% block content %}
+<div class="container legal">
+    {% include 'pages/_legal_nav.html' with tab='contact' %}
+
+    <div class="legal-hero">
+        <span class="eyebrow">We're here to help</span>
+        <h1>Contact Us</h1>
+        <p>Have a question about a course, your payment, or your certificate? Reach us through our official website.</p>
+        <a href="https://ucyaegis.pro" target="_blank" rel="noopener" class="btn btn-success contact-btn">🌐 Visit ucyaegis.pro</a>
+        <p class="muted" style="margin-top:12px;">Official website: <a href="https://ucyaegis.pro" target="_blank" rel="noopener"><strong>https://ucyaegis.pro</strong></a></p>
+    </div>
+
+    <div class="about-grid light">
+        <div class="legal-card reveal" style="--i:0"><div class="ico">🎓</div><h4>Courses &amp; Access</h4><p>Trouble opening a lecture or a course you enrolled in? Let us know and we will fix it.</p></div>
+        <div class="legal-card reveal" style="--i:1"><div class="ico">💳</div><h4>Payments</h4><p>Payment deducted but course not unlocked, or a duplicate payment? Contact us with your Transaction ID.</p></div>
+        <div class="legal-card reveal" style="--i:2"><div class="ico">📜</div><h4>Certificates</h4><p>Certificates are issued within 2 hours of completing a course. Reach out if yours is delayed.</p></div>
+        <div class="legal-card reveal" style="--i:3"><div class="ico">↩️</div><h4>Refunds</h4><p>Read our <a href="{% url 'refund_policy' %}"><strong>Refund Policy</strong></a> and then contact us for eligible requests.</p></div>
+    </div>
+</div>
+{% endblock %}

@@ -1,24 +1,230 @@
 {% extends 'base.html' %}
+{% load course_extras %}
+
 {% block title %}Watch - {{ course.title }}{% endblock %}
+
 {% block content %}
 <div class="container">
-    <h2 class="section-title">{{ course.title }}</h2>
 
+    <div class="flex-between">
+        <h2 class="section-title">{{ course.title }}</h2>
+        {% if enrolled %}
+            <span class="badge badge-unlocked">✓ Enrolled</span>
+        {% else %}
+            <span class="badge badge-locked">Free Demo</span>
+        {% endif %}
+    </div>
+
+    {% if not enrolled %}
+    <div class="msg warning inline">
+        You're watching a <strong>free demo</strong>.
+        <a href="{% url 'initiate_payment' course.id %}" class="btn btn-primary btn-sm" style="margin-left:10px;">
+            {% if course.is_free %}Enroll for Free{% else %}Subscribe - ₹{{ course.price }}{% endif %}
+        </a>
+    </div>
+    {% endif %}
+
+    <!-- ===== PROGRESS PANEL ===== -->
+    {% if enrolled %}
+    <div class="progress-panel">
+        {% include 'courses/_ring.html' with percent=progress.percent label='complete' size='' %}
+        <div class="info">
+            <h3>
+                {% if progress.status == 'completed' %}🎉 You finished this course!
+                {% elif progress.status == 'not_started' %}Let's get started!
+                {% else %}Your progress{% endif %}
+            </h3>
+            <div class="pp-stats">
+                <span><b>{{ progress.done_lectures }}</b> / {{ progress.total_lectures }} lectures</span>
+                {% if progress.total_assignments %}
+                    <span><b>{{ progress.passed_assignments }}</b> / {{ progress.total_assignments }} assignments passed</span>
+                {% endif %}
+                <span><b>{{ progress.lectures_left }}</b> lecture{{ progress.lectures_left|pluralize }} left</span>
+            </div>
+            {% include 'courses/_bar.html' with p=progress %}
+            <div class="journey" title="Your journey">
+                {% for lecture in lectures %}
+                    <i style="--i:{{ forloop.counter0 }}"
+                       class="{% if lecture.id in completed_ids %}done{% elif next_lecture and next_lecture.id == lecture.id %}current{% endif %}"
+                       title="{{ forloop.counter }}. {{ lecture.title }}"></i>
+                {% endfor %}
+            </div>
+        </div>
+        {% if next_lecture and progress.status != 'completed' %}
+            <a href="#lecture-{{ next_lecture.id }}" class="btn btn-primary">▶ Continue: Lecture {{ next_lecture.order }}</a>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <!-- ===== COURSE RESOURCES ===== -->
+    {% if enrolled and resources %}
+    <div class="resource-panel reveal">
+        <h3 style="color:var(--navy);margin-top:0;">📚 Course Resources</h3>
+        <p class="muted">These resources are available only inside this enrolled course.</p>
+        <ul class="lecture-list">
+            {% for resource in resources %}
+            <li>
+                <span>{{ resource.get_resource_type_display }} — {{ resource.title }}</span>
+                <a href="{{ resource.file.url }}" class="btn btn-outline btn-sm" target="_blank" download>⬇ Download</a>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+    <!-- ===== LECTURES ===== -->
     {% for lecture in lectures %}
-    <div style="background:white;padding:20px;border-radius:10px;margin-bottom:20px;box-shadow:0 2px 10px rgba(0,0,0,0.08);">
-        <h3 style="color:var(--navy);">{{ forloop.counter }}. {{ lecture.title }}</h3>
-        {% if lecture.description %}<p>{{ lecture.description }}</p>{% endif %}
-        <video controls preload="metadata">
-            <source src="{{ lecture.video_file.url }}">
-            Your browser does not support the video tag.
-        </video>
+    <div id="lecture-{{ lecture.id }}"
+         class="lecture-card reveal {% if lecture.id in completed_ids %}is-done{% elif next_lecture and next_lecture.id == lecture.id %}is-current{% elif lecture.id not in unlocked_ids %}is-locked{% endif %}">
+
+        <div class="lec-head">
+            <div class="lec-title">
+                <div class="lec-num">{% if lecture.id in completed_ids %}✓{% else %}{{ forloop.counter }}{% endif %}</div>
+                <h3>{{ lecture.title }}</h3>
+            </div>
+            {% if lecture.id in completed_ids %}
+                <span class="badge badge-done">✓ Completed</span>
+            {% elif lecture.id in unlocked_ids %}
+                <span class="badge badge-progress">▶ Available</span>
+            {% else %}
+                <span class="badge badge-locked">🔒 Locked</span>
+            {% endif %}
+        </div>
+
+        {% if lecture.description %}<p class="muted" style="margin-top:12px;">{{ lecture.description }}</p>{% endif %}
+
+        {% if lecture.id in unlocked_ids %}
+
+            <video controls preload="metadata" data-lecture="{{ lecture.id }}"
+                   data-auto="{% if enrolled and lecture.id not in completed_ids %}1{% endif %}">
+                <source src="{{ lecture.video_file.url }}">
+                Your browser does not support video.
+            </video>
+
+            {% if enrolled and lecture.id not in completed_ids %}
+            <form method="post" action="{% url 'complete_lecture' lecture.id %}" class="complete-form" style="margin-top:16px;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-success">✓ Mark Lecture Complete</button>
+                <span class="muted" style="margin-left:8px;">It is also marked automatically when the video ends.</span>
+            </form>
+            {% endif %}
+
+            <!-- ASSIGNMENT -->
+            {% with lecture_assignments=assignments_by_lecture|get_item:lecture.id %}
+                {% for assignment in lecture_assignments %}
+                {% with submission=submissions|get_item:assignment.id %}
+                <div id="assignment-{{ assignment.id }}" class="assignment-box {% if submission and submission.is_correct %}passed{% endif %}">
+                    <h4>📝 {{ assignment.title }}</h4>
+                    <p><strong>Assignment:</strong> {{ assignment.question }}</p>
+
+                    {% if submission and submission.is_correct %}
+                        <div class="msg success inline">✓ Assignment passed. The next lecture is unlocked.</div>
+                    {% elif enrolled and lecture.id in completed_ids %}
+                        <form method="post" action="{% url 'submit_assignment' assignment.id %}">
+                            {% csrf_token %}
+                            {% if submission %}
+                                <div class="msg warning inline">Previous answer was incorrect. Try again.</div>
+                            {% endif %}
+                            {{ assignment_form.answer }}
+                            <button type="submit" class="btn btn-primary" style="margin-top:10px;">Submit Assignment</button>
+                        </form>
+                    {% else %}
+                        <p class="muted">Complete this lecture first, then the assignment will unlock.</p>
+                    {% endif %}
+                </div>
+                {% endwith %}
+                {% endfor %}
+            {% endwith %}
+
+            <!-- QUESTIONS -->
+            <div style="margin-top:22px;border-top:1px solid var(--line);padding-top:16px;">
+                <h4 style="color:var(--navy);margin-top:0;">💬 Questions on this video</h4>
+
+                {% with lecture_questions=questions_by_lecture|get_item:lecture.id %}
+                    {% for q in lecture_questions %}
+                    <div class="qa-item">
+                        <p style="margin:0 0 6px;"><strong>{{ q.student.username }}:</strong> {{ q.question_text }}</p>
+                        {% if q.is_answered %}
+                            <p style="margin:0;color:var(--success-d);"><strong>Answer:</strong> {{ q.answer_text }}</p>
+                        {% else %}
+                            <p style="margin:0;color:#94a3b8;">Waiting for instructor's answer...</p>
+                        {% endif %}
+                    </div>
+                    {% empty %}
+                    <p class="muted">No questions yet.</p>
+                    {% endfor %}
+                {% endwith %}
+
+                <form method="post" action="{% url 'ask_question' lecture.id %}">
+                    {% csrf_token %}
+                    {{ question_form.question_text }}
+                    <button type="submit" class="btn btn-primary btn-sm" style="margin-top:10px;">Ask a Question</button>
+                </form>
+            </div>
+
+        {% else %}
+            <div class="lock-box">
+                <span class="lock">🔒</span>
+                <p>Complete the previous lecture and assignment to unlock this lecture.</p>
+                {% if not enrolled %}
+                <a href="{% url 'initiate_payment' course.id %}" class="btn btn-primary">
+                    {% if course.is_free %}Enroll for Free{% else %}Subscribe - ₹{{ course.price }}{% endif %}
+                </a>
+                {% endif %}
+            </div>
+        {% endif %}
     </div>
     {% empty %}
-    <p>No lectures have been uploaded to this course yet. Please check back soon.</p>
+        <p class="muted">No lectures have been uploaded yet.</p>
     {% endfor %}
 
+    <!-- ===== CERTIFICATE ===== -->
+    {% if certificate %}
+    <div class="cert-banner">
+        <div class="trophy">🏆</div>
+        <h3>Your Certificate is Ready!</h3>
+        <p>You have completed all required lectures and assignments.</p>
+        <p><strong>Credential ID:</strong> <span class="code-chip">{{ certificate.credential_id }}</span></p>
+        <a href="{% url 'my_certificates' %}" class="btn btn-success">View My Certificate</a>
+        <a href="{% url 'verify_credential' %}?credential={{ certificate.credential_id }}" class="btn btn-outline">Verify Credential</a>
+    </div>
+    {% elif enrolled and progress.status == 'completed' %}
+    <div class="cert-banner pending">
+        <div class="trophy">🎉</div>
+        <h3>Course Completed!</h3>
+        <p>Congratulations, you have finished all lectures and assignments.</p>
+        <div class="pending-note"><span class="spinner"></span> Your certificate will be available within <strong>2 hours</strong>.</div>
+        <p class="muted" style="margin-top:10px;">You will find it under <a href="{% url 'my_certificates' %}"><strong>My Certificates</strong></a>.</p>
+    </div>
+    {% endif %}
+
     <div class="text-center mt-20">
-        <a href="{% url 'student_dashboard' %}" class="btn btn-outline">Back to Dashboard</a>
+        <a href="{% url 'student_dashboard' %}" class="btn btn-outline">← Back to Dashboard</a>
     </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function () {
+    // Auto-mark a lecture complete when its video finishes playing
+    document.querySelectorAll('video[data-auto="1"]').forEach(function (v) {
+        v.addEventListener('ended', function () {
+            var form = v.closest('.lecture-card').querySelector('.complete-form');
+            if (form) form.submit();
+        });
+    });
+
+    // Scroll to the current lecture after completing / submitting (hash links)
+    if (location.hash) {
+        var el = document.querySelector(location.hash);
+        if (el) setTimeout(function () { el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 400);
+    }
+
+    {% if progress.status == 'completed' and enrolled %}
+    var key = 'ucy-confetti-{{ course.id }}';
+    if (!sessionStorage.getItem(key)) { sessionStorage.setItem(key, '1'); setTimeout(window.confetti, 600); }
+    {% endif %}
+})();
+</script>
 {% endblock %}
