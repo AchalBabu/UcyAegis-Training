@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block title %}Manage Lectures - {{ course.title }}{% endblock %}
+{% block content %}
+<div class="container">
+    <h2 class="section-title">Upload Recorded Lecture</h2>
+    <p>Course: <strong>{{ course.title }}</strong></p>
+
+    <form method="post" enctype="multipart/form-data" class="styled-form">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-success" style="width:100%;">Upload Lecture</button>
+    </form>
+
+    <h3 style="color:var(--navy);margin-top:40px;">Existing Lectures</h3>
+    <ul class="lecture-list">
+        {% for lecture in lectures %}
+        <li>
+            <span>{{ lecture.order }}. {{ lecture.title }} ({{ lecture.duration_minutes }} min)</span>
+            <a href="{% url 'lecture_delete' lecture.id %}" class="btn btn-danger" style="padding:6px 14px;font-size:13px;">Delete</a>
+        </li>
+        {% empty %}
+        <p>No lectures uploaded yet for this course.</p>
+        {% endfor %}
+    </ul>
+
+    <div class="text-center mt-20">
+        <a href="{% url 'admin_dashboard' %}" class="btn btn-outline">Back to Dashboard</a>
+    </div>
+</div>
+{% endblock %}

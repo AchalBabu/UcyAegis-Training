@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}{{ course.title }}{% endblock %}
+{% block content %}
+<div class="container" style="max-width:900px;">
+    <div class="flex-between">
+        <h2 class="section-title">{{ course.title }}</h2>
+        <div class="price-tag">{% if course.is_free %}Free{% else %}₹{{ course.price }}{% endif %}</div>
+    </div>
+
+    {% if course.thumbnail %}
+        <img src="{{ course.thumbnail.url }}" alt="{{ course.title }}" style="width:100%;max-height:340px;object-fit:cover;border-radius:20px;margin-bottom:22px;box-shadow:var(--shadow);animation:fadeUp .7s both;">
+    {% endif %}
+
+    <p style="font-size:16px;">{{ course.description }}</p>
+
+    <h3 style="color:var(--navy);margin-top:32px;">Lectures ({{ lectures|length }})</h3>
+    {% if not is_enrolled and not course.is_free %}
+    <p class="muted">First {{ preview_count }} lecture{{ preview_count|pluralize }} free to preview — subscribe to unlock the rest.</p>
+    {% endif %}
+    <ul class="lecture-list">
+        {% for lecture in lectures %}
+        <li class="reveal" style="--i:{{ forloop.counter0 }}">
+            <span><strong>{{ forloop.counter }}.</strong> {{ lecture.title }}</span>
+            {% if lecture.id in unlocked_ids %}
+                <span class="badge badge-unlocked">{% if is_enrolled or course.is_free %}Unlocked{% else %}Free Preview{% endif %}</span>
+            {% else %}
+                <span class="badge badge-locked">🔒 Locked</span>
+            {% endif %}
+        </li>
+        {% empty %}
+        <p class="muted">No lectures uploaded yet.</p>
+        {% endfor %}
+    </ul>
+
+    <div class="mt-20 text-center">
+        {% if user.is_authenticated and user.role == 'student' %}
+            {% if is_enrolled %}
+                <a href="{% url 'watch_course' course.slug %}" class="btn btn-success">▶ Go to Course</a>
+            {% else %}
+                <a href="{% url 'initiate_payment' course.id %}" class="btn btn-primary">
+                    {% if course.is_free %}Enroll for Free{% else %}Subscribe Now - ₹{{ course.price }}{% endif %}
+                </a>
+                {% if not course.is_free %}
+                    <a href="{% url 'watch_course' course.slug %}" class="btn btn-outline">Watch Free Demo</a>
+                {% endif %}
+            {% endif %}
+        {% elif not user.is_authenticated %}
+            <a href="{% url 'student_login' %}" class="btn btn-primary">Login as Student to Enroll</a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Assignments - {{ course.title }}
+{% endblock %}
+
+{% block content %}
+
+<div class="container">
+
+    <h2 class="section-title">
+        Manage Assignments
+    </h2>
+
+    <p>
+        Course:
+        <strong>{{ course.title }}</strong>
+    </p>
+
+    <p style="color:#666;">
+        Assignment selected lecture ke immediately baad dikhega.
+        Student ko pass karna mandatory hoga.
+    </p>
+
+
+    <form
+        method="post"
+        class="styled-form"
+        style="
+        background:white;
+        padding:20px;
+        border-radius:10px;
+        "
+    >
+
+        {% csrf_token %}
+
+        {{ form.as_p }}
+
+        <button
+            type="submit"
+            class="btn btn-success"
+            style="width:100%;"
+        >
+            Add Assignment
+        </button>
+
+    </form>
+
+
+    <h3 style="color:var(--navy);margin-top:35px;">
+        Existing Assignments
+    </h3>
+
+
+    <ul class="lecture-list">
+
+        {% for assignment in assignments %}
+
+        <li>
+
+            <span>
+
+                <strong>
+                    {{ assignment.title }}
+                </strong>
+
+                <br>
+
+                <small>
+
+                    After Lecture
+                    {{ assignment.after_lecture.order }}:
+
+                    {{ assignment.after_lecture.title }}
+
+                </small>
+
+            </span>
+
+        </li>
+
+        {% empty %}
+
+        <p>
+            No assignments added yet.
+        </p>
+
+        {% endfor %}
+
+    </ul>
+
+
+    <div class="text-center mt-20">
+
+        <a
+            href="{% url 'admin_dashboard' %}"
+            class="btn btn-outline"
+        >
+            Back to Dashboard
+        </a>
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block title %}Student Login{% endblock %}
+{% block content %}
+<div class="container">
+    <h2 class="section-title text-center" style="display:block;text-align:center;">Student Login</h2>
+    <form method="post" class="styled-form">
+        {% csrf_token %}
+        <label>Username</label>
+        <input type="text" name="username" required>
+        <label>Password</label>
+        <input type="password" name="password" required>
+        <button type="submit" class="btn btn-primary" style="width:100%;">Login</button>
+        <p class="text-center mt-20">
+            New here? <a href="{% url 'student_register' %}" style="color:var(--blue);font-weight:600;">Create a student account</a>
+        </p>
+    </form>
+</div>
+{% endblock %}

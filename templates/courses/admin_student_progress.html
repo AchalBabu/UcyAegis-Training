@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% block title %}{{ student.username }} — {{ course.title }}{% endblock %}
+{% block content %}
+<div class="container" style="max-width:900px;">
+
+    <div class="progress-panel" style="position:static;">
+        {% include 'courses/_ring.html' with percent=progress.percent label=progress.status_label size='' %}
+        <div class="info">
+            <h3>{{ student.get_full_name|default:student.username }}</h3>
+            <p class="muted" style="margin:0;">{{ student.email }} · {{ course.title }}</p>
+            <div class="pp-stats">
+                <span><b>{{ progress.done_lectures }}</b> / {{ progress.total_lectures }} lectures</span>
+                <span><b>{{ progress.passed_assignments }}</b> / {{ progress.total_assignments }} assignments</span>
+                <span>Enrolled {{ enrollment.enrolled_at|date:"d M Y" }}</span>
+                {% if progress.last_activity %}<span>Last active {{ progress.last_activity|timesince }} ago</span>{% endif %}
+            </div>
+            {% include 'courses/_bar.html' with p=progress %}
+        </div>
+    </div>
+
+    {% if certificate %}
+        <div class="msg success inline">🎓 Certificate issued — <span class="code-chip">{{ certificate.credential_id }}</span></div>
+    {% endif %}
+
+    <h3 style="color:var(--navy);">Lecture by lecture</h3>
+    <div class="timeline">
+        {% for row in rows %}
+        <div class="tl-item {% if row.completed_at %}done{% endif %}" style="--i:{{ forloop.counter0 }}">
+            <div class="flex-between">
+                <strong>{{ forloop.counter }}. {{ row.lecture.title }}</strong>
+                {% if row.completed_at %}
+                    <span class="badge badge-done">✓ Completed {{ row.completed_at|date:"d M, h:i A" }}</span>
+                {% else %}
+                    <span class="badge badge-idle">Not completed</span>
+                {% endif %}
+            </div>
+            {% for item in row.assignments %}
+                <div style="margin-top:10px;padding:10px 14px;background:var(--bg);border-radius:10px;font-size:14px;">
+                    📝 <strong>{{ item.assignment.title }}</strong> —
+                    {% if item.submission and item.submission.is_correct %}
+                        <span class="badge badge-done">Passed</span>
+                    {% elif item.submission %}
+                        <span class="badge badge-warn">Attempted · incorrect</span>
+                        <div class="muted" style="margin-top:4px;">Last answer: {{ item.submission.answer|truncatechars:80 }}</div>
+                    {% else %}
+                        <span class="badge badge-idle">Not attempted</span>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+        {% empty %}
+            <p class="muted">This course has no lectures yet.</p>
+        {% endfor %}
+    </div>
+
+    <div class="text-center mt-20">
+        <a href="{% url 'admin_course_students' course.id %}" class="btn btn-outline">← Back to Students</a>
+    </div>
+</div>
+{% endblock %}

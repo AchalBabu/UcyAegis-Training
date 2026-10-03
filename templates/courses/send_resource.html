@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block title %}Send File - {{ student.username }}{% endblock %}
+{% block content %}
+<div class="container">
+    <h2 class="section-title">Send a Personal File</h2>
+    <p>To student: <strong>{{ student.username }}</strong> ({{ student.email }})</p>
+    <p style="color:#666;font-size:14px;">This file (e.g. a completion certificate) will appear ONLY on this student's own dashboard — no one else will see it.</p>
+
+    <form method="post" enctype="multipart/form-data" class="styled-form">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-success" style="width:100%;">Send File</button>
+    </form>
+
+    <div class="text-center mt-20">
+        <a href="{% url 'admin_course_students' course.id %}" class="btn btn-outline">Back to Students</a>
+    </div>
+</div>
+{% endblock %}

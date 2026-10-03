@@ -1,0 +1,160 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Ucyaegis Training{% endblock %}</title>
+    <link rel="icon" href="{% static 'logo.jpeg' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <script>document.documentElement.classList.add('js');</script>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+        <linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#2563eb"/>
+            <stop offset="60%" stop-color="#4f46e5"/>
+            <stop offset="100%" stop-color="#06b6d4"/>
+        </linearGradient>
+    </defs>
+</svg>
+
+<nav class="navbar">
+    <a href="{% url 'home' %}" class="brand">
+        <img src="{% static 'logo.jpeg' %}" alt="Ucyaegis Logo">
+        <span>Ucyaegis Training</span>
+    </a>
+    <button class="nav-toggle" id="navToggle" aria-label="Menu">☰</button>
+    <div class="nav-links" id="navLinks">
+        <a href="{% url 'home' %}">Courses</a>
+        <a href="{% url 'home' %}#about">About Us</a>
+        {% if user.is_authenticated %}
+            {% if user.role == 'student' %}
+                <a href="{% url 'student_dashboard' %}">My Dashboard</a>
+                <a href="{% url 'my_certificates' %}">Certificates</a>
+                <a href="{% url 'profile' %}">Profile</a>
+                <a href="{% url 'payment_history' %}">Payments</a>
+            {% elif user.role == 'admin' or user.is_superuser %}
+                <a href="{% url 'admin_dashboard' %}">Admin Dashboard</a>
+            {% endif %}
+            <span class="nav-hello">Hi, {{ user.username }}</span>
+            <form action="{% url 'logout' %}" method="get" style="display:inline;">
+                <button type="submit">Logout</button>
+            </form>
+        {% else %}
+            <a href="{% url 'student_login' %}">Student Login</a>
+        {% endif %}
+        <a href="{% url 'verify_credential' %}">Verify Certificate</a>
+        <a href="{% url 'contact' %}">Contact Us</a>
+        <div class="nav-dd">
+            <button type="button" class="nav-dd-btn" aria-haspopup="true">Policies ▾</button>
+            <div class="nav-dd-menu">
+                <a href="{% url 'refund_policy' %}">↩️ Refund Policy</a>
+                <a href="{% url 'privacy_policy' %}">🔒 Privacy Policy</a>
+                <a href="{% url 'terms' %}">📄 Terms &amp; Conditions</a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+{% if messages %}
+<div class="messages" id="toasts">
+    {% for message in messages %}
+        <div class="msg {{ message.tags }}">{{ message }}<button class="x" aria-label="Close">×</button></div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<main>
+    {% block content %}{% endblock %}
+</main>
+
+<footer class="site-footer">
+    <div class="footer-inner">
+        <div class="footer-brand">
+            <img src="{% static 'logo.jpeg' %}" alt="Ucyaegis Logo">
+            <span>Ucyaegis Training</span>
+        </div>
+        <div class="footer-links">
+            <a href="{% url 'home' %}">Courses</a>
+            <a href="{% url 'home' %}#about">About Us</a>
+            <a href="{% url 'verify_credential' %}">Verify Certificate</a>
+            <a href="{% url 'contact' %}">Contact Us</a>
+            <a href="{% url 'refund_policy' %}">Refund Policy</a>
+            <a href="{% url 'privacy_policy' %}">Privacy Policy</a>
+            <a href="{% url 'terms' %}">Terms &amp; Conditions</a>
+            {% if not user.is_authenticated %}<a href="{% url 'student_login' %}">Student Login</a>{% endif %}
+        </div>
+    </div>
+    <div class="footer-copy">&copy; {% now "Y" %} Ucyaegis Training. All rights reserved.</div>
+</footer>
+
+<script>
+(function () {
+    // mobile menu
+    var t = document.getElementById('navToggle'), l = document.getElementById('navLinks');
+    if (t) t.addEventListener('click', function () { l.classList.toggle('open'); });
+
+    // policies dropdown (tap support for phones)
+    document.querySelectorAll('.nav-dd-btn').forEach(function (b) {
+        b.addEventListener('click', function (e) { e.stopPropagation(); b.parentElement.classList.toggle('open'); });
+    });
+    document.addEventListener('click', function () { document.querySelectorAll('.nav-dd.open').forEach(function (d) { d.classList.remove('open'); }); });
+
+    // toasts: close button + auto hide
+    function hide(el) { el.classList.add('hide'); setTimeout(function () { el.remove(); }, 400); }
+    document.querySelectorAll('#toasts .msg').forEach(function (m, i) {
+        m.style.animationDelay = (i * 120) + 'ms';
+        m.querySelector('.x').addEventListener('click', function () { hide(m); });
+        setTimeout(function () { hide(m); }, 6000 + i * 400);
+    });
+
+    // scroll reveal
+    var items = document.querySelectorAll('.reveal');
+    if ('IntersectionObserver' in window) {
+        var io = new IntersectionObserver(function (entries) {
+            entries.forEach(function (e) {
+                if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+            });
+        }, { threshold: .12 });
+        items.forEach(function (el) { io.observe(el); });
+    } else { items.forEach(function (el) { el.classList.add('in'); }); }
+
+    // animated counters  <span data-count="75" data-suffix="%">
+    document.querySelectorAll('[data-count]').forEach(function (el) {
+        var target = parseFloat(el.dataset.count) || 0, pre = el.dataset.prefix || '', suf = el.dataset.suffix || '';
+        var start = null, dur = 1300;
+        function step(ts) {
+            if (!start) start = ts;
+            var p = Math.min((ts - start) / dur, 1), e = 1 - Math.pow(1 - p, 3);
+            el.textContent = pre + Math.round(target * e).toLocaleString('en-IN') + suf;
+            if (p < 1) requestAnimationFrame(step);
+        }
+        requestAnimationFrame(step);
+    });
+
+    // confetti  <body data-confetti> or call window.confetti()
+    window.confetti = function () {
+        var colors = ['#2563eb', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4'];
+        for (var i = 0; i < 70; i++) {
+            var c = document.createElement('i');
+            c.className = 'confetti';
+            c.style.left = Math.random() * 100 + 'vw';
+            c.style.background = colors[i % colors.length];
+            c.style.animationDuration = (2.5 + Math.random() * 2.5) + 's';
+            c.style.animationDelay = (Math.random() * .8) + 's';
+            c.style.borderRadius = Math.random() > .5 ? '50%' : '2px';
+            document.body.appendChild(c);
+            setTimeout(function (n) { n.remove(); }.bind(null, c), 6500);
+        }
+    };
+})();
+</script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

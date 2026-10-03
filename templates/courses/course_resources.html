@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block title %}Resources - {{ course.title }}{% endblock %}
+{% block content %}
+<div class="container" style="max-width:900px;">
+    <h2 class="section-title">📚 Course Resources</h2>
+
+    <div class="panel">
+        <h3>{{ course.title }}</h3>
+        <p class="muted" style="margin:0;">These PDFs / eBooks appear automatically inside the course for every enrolled student. You can edit, replace or delete them any time.</p>
+    </div>
+
+    <div class="panel">
+        <h3>➕ Add Resource</h3>
+        <form method="post" enctype="multipart/form-data" class="styled-form">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-success" style="width:100%;">Add Resource</button>
+        </form>
+    </div>
+
+    <div class="panel">
+        <h3>Uploaded Resources ({{ resources|length }})</h3>
+        <ul class="lecture-list">
+            {% for resource in resources %}
+            <li>
+                <div class="res-main">
+                    <div class="res-icon">{% if resource.resource_type == 'pdf' %}📄{% elif resource.resource_type == 'ebook' %}📖{% else %}📎{% endif %}</div>
+                    <div>
+                        <strong>{{ resource.title }}</strong>
+                        <small>{{ resource.get_resource_type_display }} · added {{ resource.uploaded_at|date:"d M Y" }}</small>
+                    </div>
+                </div>
+                <div class="row-actions">
+                    <a href="{{ resource.file.url }}" target="_blank">👁 View</a>
+                    <a href="{% url 'course_resource_edit' resource.id %}">✏️ Edit</a>
+                    <a href="{% url 'course_resource_delete' resource.id %}" class="danger">🗑 Delete</a>
+                </div>
+            </li>
+            {% empty %}
+            <p class="muted">No resources uploaded yet for this course.</p>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div class="text-center mt-20">
+        <a href="{% url 'admin_dashboard' %}" class="btn btn-outline">← Back to Dashboard</a>
+    </div>
+</div>
+{% endblock %}

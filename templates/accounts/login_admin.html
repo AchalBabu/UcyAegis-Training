@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block title %}Admin Login{% endblock %}
+{% block content %}
+<div class="container">
+    <h2 class="section-title text-center" style="display:block;text-align:center;">Admin / Instructor Login</h2>
+    <form method="post" class="styled-form">
+        {% csrf_token %}
+        <label>Username</label>
+        <input type="text" name="username" required>
+        <label>Password</label>
+        <input type="password" name="password" required>
+        <button type="submit" class="btn btn-primary" style="width:100%;">Login</button>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block title %}Delete Account{% endblock %}
+{% block content %}
+<div class="container">
+    <form method="post" class="styled-form danger-zone" onsubmit="return confirm('This will permanently delete your account. Continue?');">
+        {% csrf_token %}
+        <div class="text-center">
+            <div style="font-size:54px;animation:pop .6s both;">⚠️</div>
+            <h2 style="color:var(--danger);margin:6px 0 4px;">Delete Your Account</h2>
+            <p class="muted">Are you sure, <strong>{{ user.username }}</strong>?</p>
+        </div>
+
+        <p style="margin-bottom:8px;"><strong>This will permanently delete:</strong></p>
+        <ul class="del-list">
+            <li>Your login and profile details</li>
+            <li>All course enrollments and learning progress</li>
+            <li>Assignment submissions and questions you asked</li>
+            <li>Your certificates and payment history</li>
+        </ul>
+        <p style="color:var(--danger);font-weight:600;">This action CANNOT be undone.</p>
+
+        <label for="pw">Enter your password to confirm</label>
+        <input type="password" id="pw" name="password" required autocomplete="current-password" placeholder="Your password">
+
+        <button type="submit" class="btn btn-danger" style="width:100%;">Yes, Permanently Delete My Account</button>
+        <a href="{% url 'student_dashboard' %}" class="btn btn-outline" style="width:100%;margin-top:10px;">Cancel — keep my account</a>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block title %}Payment History{% endblock %}
+{% block content %}
+<div class="container">
+    <h2 class="section-title">My Payment History</h2>
+    <table class="styled-table">
+        <thead><tr><th>Transaction ID</th><th>Course</th><th>Amount</th><th>Status</th><th>Date</th></tr></thead>
+        <tbody>
+        {% for p in payments %}
+            <tr>
+                <td>{{ p.transaction_id }}</td>
+                <td>{{ p.course.title }}</td>
+                <td>₹{{ p.amount }}</td>
+                <td>{{ p.get_status_display }}</td>
+                <td>{{ p.created_at|date:"d M Y, h:i A" }}</td>
+            </tr>
+        {% empty %}
+            <tr><td colspan="5">No payments made yet.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

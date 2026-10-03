@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block title %}Student Questions{% endblock %}
+{% block content %}
+<div class="container">
+    <h2 class="section-title">Student Questions</h2>
+
+    {% for q in questions %}
+    <div style="background:white;padding:18px 20px;border-radius:10px;margin-bottom:16px;box-shadow:0 2px 10px rgba(0,0,0,0.08);">
+        <div class="flex-between">
+            <strong style="color:var(--navy);">{{ q.lecture.course.title }} — {{ q.lecture.title }}</strong>
+            {% if q.is_answered %}
+                <span class="badge badge-unlocked">Answered</span>
+            {% else %}
+                <span class="badge badge-locked">Pending</span>
+            {% endif %}
+        </div>
+        <p style="margin:10px 0 6px;"><strong>{{ q.student.username }}</strong> asked ({{ q.created_at|date:"d M Y, h:i A" }}):</p>
+        <p style="margin:0 0 12px;color:#333;">{{ q.question_text }}</p>
+
+        {% if q.is_answered %}
+            <div style="background:var(--bg);padding:10px 14px;border-radius:8px;">
+                <strong style="color:var(--success);">Your answer:</strong> {{ q.answer_text }}
+            </div>
+        {% else %}
+            <form method="post" action="{% url 'answer_question' q.id %}">
+                {% csrf_token %}
+                {{ answer_form.answer_text }}
+                <button type="submit" class="btn btn-primary" style="margin-top:8px;">Post Answer</button>
+            </form>
+        {% endif %}
+    </div>
+    {% empty %}
+    <p>No questions have been asked yet.</p>
+    {% endfor %}
+
+    <div class="text-center mt-20">
+        <a href="{% url 'admin_dashboard' %}" class="btn btn-outline">Back to Dashboard</a>
+    </div>
+</div>
+{% endblock %}

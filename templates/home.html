@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Ucyaegis Training - Home{% endblock %}
+{% block content %}
+
+<div class="hero">
+    <img src="{% static 'logo.jpeg' %}" class="logo-hero" alt="Ucyaegis Logo">
+    <h1>Ucyaegis Training</h1>
+    <p>Learn from recorded expert lectures. Enroll, pay securely, track your progress and earn a verified certificate.</p>
+    {% if not user.is_authenticated %}
+    <div class="mt-20">
+        <a href="{% url 'student_register' %}" class="btn btn-success">🚀 Join as Student</a>
+        <a href="{% url 'student_login' %}" class="btn" style="background:rgba(255,255,255,.15);color:#fff;border-color:rgba(255,255,255,.4);">Login</a>
+    </div>
+    {% endif %}
+</div>
+
+<div class="container">
+    <h2 class="section-title reveal">Available Courses</h2>
+    <div class="card-grid">
+        {% for course in courses %}
+        <div class="card reveal" style="--i:{{ forloop.counter0 }}">
+            <div class="thumb-wrap">
+                {% if course.thumbnail %}
+                    <img src="{{ course.thumbnail.url }}" class="thumb" alt="{{ course.title }}">
+                {% else %}
+                    <img src="{% static 'logo.jpeg' %}" class="thumb" alt="{{ course.title }}" style="object-fit:contain;">
+                {% endif %}
+                <span class="tag {% if course.is_free %}free{% endif %}">{% if course.is_free %}Free{% else %}₹{{ course.price }}{% endif %}</span>
+            </div>
+            <div class="card-body">
+                <h3>{{ course.title }}</h3>
+                <p>{{ course.description|truncatewords:20 }}</p>
+                <div class="muted">🎬 {{ course.lecture_count }} lecture{{ course.lecture_count|pluralize }}</div>
+                <a href="{% url 'course_detail' course.slug %}" class="btn btn-primary">View Course</a>
+            </div>
+        </div>
+        {% empty %}
+        <p class="muted">No courses available yet. Please check back soon!</p>
+        {% endfor %}
+    </div>
+
+    <!-- ===== ABOUT US ===== -->
+    <section id="about" class="about reveal">
+        <span class="eyebrow">About Us</span>
+        <h2>Learn at your own pace with <span>Ucyaegis Training</span></h2>
+        <p class="lead">
+            Ucyaegis Training is an online learning platform built to make practical, job-ready skills easy to learn.
+            Every course is taught through recorded lectures by expert instructors, so you can learn anytime,
+            from anywhere, and revisit any lesson whenever you need.
+        </p>
+        <p class="lead">
+            Courses are structured step by step: finish a lecture, pass the assignment, and unlock the next one.
+            You always see exactly how much you have completed, and when you finish you earn a certificate with a
+            unique Credential ID that anyone can verify on this website.
+        </p>
+
+        <div class="about-grid">
+            <div class="about-item reveal" style="--i:0"><div class="ico">🎬</div><h4>Recorded Expert Lectures</h4><p>High-quality video lessons you can watch again and again, on your schedule.</p></div>
+            <div class="about-item reveal" style="--i:1"><div class="ico">📝</div><h4>Assignments</h4><p>Practice after each lecture and unlock the next one only when you are ready.</p></div>
+            <div class="about-item reveal" style="--i:2"><div class="ico">📈</div><h4>Progress Tracking</h4><p>See your completed lectures and assignments with a live progress bar.</p></div>
+            <div class="about-item reveal" style="--i:3"><div class="ico">💬</div><h4>Ask the Instructor</h4><p>Stuck on something? Ask a question under any lecture and get a direct answer.</p></div>
+            <div class="about-item reveal" style="--i:4"><div class="ico">🎓</div><h4>Verified Certificates</h4><p>Earn a certificate with a unique ID that employers can verify online.</p></div>
+            <div class="about-item reveal" style="--i:5"><div class="ico">🔒</div><h4>Secure UPI Payments</h4><p>Pay safely through Razorpay UPI and get instant access to your course.</p></div>
+        </div>
+
+        <div class="about-cta">
+            {% if not user.is_authenticated %}
+                <a href="{% url 'student_register' %}" class="btn btn-success">🚀 Join as Student</a>
+            {% else %}
+                <a href="{% url 'student_dashboard' %}" class="btn btn-success">Go to My Dashboard</a>
+            {% endif %}
+            <a href="{% url 'verify_credential' %}" class="btn btn-outline">Verify a Certificate</a>
+        </div>
+    </section>
+</div>
+{% endblock %}

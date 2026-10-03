@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}My Dashboard{% endblock %}
+
+{% block content %}
+<div class="container">
+
+    <div class="welcome">
+        <div>
+            <h2>Welcome back, {{ user.get_full_name|default:user.username }} 👋</h2>
+            {% if enrollments %}
+                <p>You're <b>{{ avg_percent }}%</b> through your learning on average. Keep the streak going!</p>
+            {% else %}
+                <p>Pick your first course below and start learning today.</p>
+            {% endif %}
+        </div>
+        {% if resume %}
+            <a href="{% url 'watch_course' resume.course.slug %}" class="btn">▶ Resume “{{ resume.course.title|truncatechars:24 }}”</a>
+        {% endif %}
+    </div>
+
+    <div class="dashboard-stats">
+        <div class="stat-box reveal" style="--i:0">
+            <div class="stat-icon">📚</div>
+            <div><div class="num" data-count="{{ enrollments|length }}">0</div><div class="label">Enrolled Courses</div></div>
+        </div>
+        <div class="stat-box reveal" style="--i:1">
+            <div class="stat-icon">🎬</div>
+            <div><div class="num" data-count="{{ total_done_lectures }}">0</div><div class="label">Lectures Completed</div></div>
+        </div>
+        <div class="stat-box reveal" style="--i:2">
+            <div class="stat-icon">📈</div>
+            <div><div class="num" data-count="{{ avg_percent }}" data-suffix="%">0</div><div class="label">Average Progress</div></div>
+        </div>
+        <div class="stat-box reveal" style="--i:3">
+            <div class="stat-icon">🏆</div>
+            <div><div class="num" data-count="{{ certificates|length }}">0</div><div class="label">Certificates Earned</div></div>
+        </div>
+    </div>
+
+    <h2 class="section-title">My Learning</h2>
+
+    <div class="card-grid">
+        {% for e in enrollments %}
+        <div class="card course-progress-card reveal" style="--i:{{ forloop.counter0 }}">
+            <div class="thumb-wrap">
+                {% if e.course.thumbnail %}
+                    <img src="{{ e.course.thumbnail.url }}" class="thumb" alt="{{ e.course.title }}">
+                {% else %}
+                    <img src="{% static 'logo.jpeg' %}" class="thumb" alt="" style="object-fit:contain;">
+                {% endif %}
+                <span class="tag {% if e.progress.status == 'completed' %}free{% endif %}">{{ e.progress.status_label }}</span>
+            </div>
+            <div class="card-body">
+                <div class="cp-top">
+                    <h3>{{ e.course.title }}</h3>
+                    {% include 'courses/_ring.html' with percent=e.progress.percent size='sm' %}
+                </div>
+                {% include 'courses/_bar.html' with p=e.progress %}
+                <div class="progress-meta">
+                    <span><b>{{ e.progress.done_lectures }}</b>/{{ e.progress.total_lectures }} lectures</span>
+                    {% if e.progress.total_assignments %}
+                        <span><b>{{ e.progress.passed_assignments }}</b>/{{ e.progress.total_assignments }} assignments</span>
+                    {% endif %}
+                </div>
+                {% if e.certificate_waiting %}
+                    <div class="pending-note sm"><span class="spinner"></span> Certificate available within 2 hours</div>
+                {% elif e.certificate_ready %}
+                    <div class="pending-note sm ok">🏆 Certificate ready</div>
+                {% endif %}
+                {% if e.progress.next_lecture and e.progress.status != 'completed' %}
+                    <p class="muted" style="flex:0">Up next: <b>{{ e.progress.next_lecture.title|truncatechars:34 }}</b></p>
+                {% endif %}
+                <a href="{% url 'watch_course' e.course.slug %}" class="btn {% if e.progress.status == 'completed' %}btn-outline{% else %}btn-success{% endif %}">
+                    {% if e.progress.status == 'completed' %}🏆 Review Course{% elif e.progress.status == 'not_started' %}▶ Start Learning{% else %}▶ Continue Learning{% endif %}
+                </a>
+            </div>
+        </div>
+        {% empty %}
+        <p class="muted">You are not enrolled in any course yet.</p>
+        {% endfor %}
+    </div>
+
+    <h2 class="section-title" style="margin-top:44px;">Explore More Courses</h2>
+
+    <div class="card-grid">
+        {% for course in available_courses %}
+        <div class="card reveal" style="--i:{{ forloop.counter0 }}">
+            <div class="thumb-wrap">
+                {% if course.thumbnail %}
+                    <img src="{{ course.thumbnail.url }}" class="thumb" alt="{{ course.title }}">
+                {% else %}
+                    <img src="{% static 'logo.jpeg' %}" class="thumb" alt="" style="object-fit:contain;">
+                {% endif %}
+                <span class="tag {% if course.is_free %}free{% endif %}">{% if course.is_free %}Free{% else %}₹{{ course.price }}{% endif %}</span>
+            </div>
+            <div class="card-body">
+                <h3>{{ course.title }}</h3>
+                <p>{{ course.description|truncatewords:15 }}</p>
+                <a href="{% url 'course_detail' course.slug %}" class="btn btn-primary">View &amp; Enroll</a>
+            </div>
+        </div>
+        {% empty %}
+        <p class="muted">No new courses to show right now.</p>
+        {% endfor %}
+    </div>
+
+    <div class="text-center mt-20" style="border-top:1px solid var(--line);padding-top:20px;">
+        <a href="{% url 'delete_account' %}" style="color:var(--danger);font-size:13px;">Delete My Account</a>
+    </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,6 @@
+<div class="legal-tabs">
+    <a href="{% url 'contact' %}" class="{% if tab == 'contact' %}on{% endif %}">Contact Us</a>
+    <a href="{% url 'refund_policy' %}" class="{% if tab == 'refund' %}on{% endif %}">Refund Policy</a>
+    <a href="{% url 'privacy_policy' %}" class="{% if tab == 'privacy' %}on{% endif %}">Privacy Policy</a>
+    <a href="{% url 'terms' %}" class="{% if tab == 'terms' %}on{% endif %}">Terms &amp; Conditions</a>
+</div>

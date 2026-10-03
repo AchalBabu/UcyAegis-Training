@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block title %}Payment Successful{% endblock %}
+{% block content %}
+<div class="container text-center">
+    <div style="font-size:72px;animation:pop .7s both;">✅</div>
+    <h2 style="color:var(--success-d);font-size:32px;animation:fadeUp .7s .1s both;">Payment Successful!</h2>
+    <p>Transaction ID: <strong>{{ payment.transaction_id }}</strong></p>
+    <p>Amount Paid: <strong>₹{{ payment.amount }}</strong></p>
+    <p>You are now enrolled in <strong>{{ payment.course.title }}</strong>.</p>
+    <a href="{% url 'watch_course' payment.course.slug %}" class="btn btn-success mt-20">▶ Start Learning Now</a>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>window.addEventListener('load', function(){ setTimeout(window.confetti, 300); });</script>
+{% endblock %}

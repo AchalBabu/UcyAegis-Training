@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}My Certificates | Ucyaegis{% endblock %}
+{% block content %}
+<div class="container">
+    <h2 class="section-title">My Certificates</h2>
+    <p class="muted" style="margin-top:-10px;margin-bottom:26px;">Certificates you have earned after completing your courses.</p>
+
+    {% for course in pending_courses %}
+    <div class="cert-banner pending" style="text-align:left;display:flex;gap:18px;align-items:center;flex-wrap:wrap;">
+        <div class="trophy" style="font-size:42px;">⏳</div>
+        <div style="flex:1;min-width:220px;">
+            <h3 style="font-size:19px;">{{ course.title }}</h3>
+            <div class="pending-note"><span class="spinner"></span> Course completed — your certificate will be available within <strong>2 hours</strong>.</div>
+        </div>
+    </div>
+    {% endfor %}
+
+    {% if certificates %}
+        <div class="card-grid">
+            {% for certificate in certificates %}
+            <div class="cert-card reveal" style="--i:{{ forloop.counter0 }}">
+                <div class="cert-medal">✓</div>
+                <h3 style="margin:0 0 10px;color:var(--navy);">{{ certificate.course.title }}</h3>
+                <p style="margin:8px 0;"><strong>Credential ID</strong><br><span class="code-chip">{{ certificate.credential_id }}</span></p>
+                <p class="muted"><strong>Issued:</strong> {{ certificate.issued_at|date:"d M Y" }}</p>
+                <div class="row-actions" style="margin-top:18px;">
+                    {% if certificate.certificate_file %}
+                        <a href="{{ certificate.certificate_file.url }}" target="_blank">📄 View Certificate</a>
+                    {% endif %}
+                    <a href="{% url 'verify_credential' %}?credential={{ certificate.credential_id }}">✔ Verify</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% elif not pending_courses %}
+        <div class="cert-card text-center" style="padding:50px 25px;">
+            <div style="font-size:56px;animation:float 3s ease-in-out infinite;">🎓</div>
+            <h3>No Certificates Yet</h3>
+            <p class="muted">Complete all required lectures and assignments to earn your certificate.</p>
+            <a href="{% url 'student_dashboard' %}" class="btn btn-primary">Go to My Courses</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

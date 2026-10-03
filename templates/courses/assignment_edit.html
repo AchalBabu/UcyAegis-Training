@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block title %}Edit Assignment - {{ assignment.title }}{% endblock %}
+{% block content %}
+<div class="container">
+    <h2 class="section-title text-center" style="display:block;text-align:center;">✏️ Edit Assignment</h2>
+    <p class="text-center muted">Course: <strong>{{ course.title }}</strong></p>
+
+    <form method="post" class="styled-form">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <div class="msg info inline" style="font-size:13px;">
+            If you change the correct answer, existing student submissions are re-checked automatically.
+        </div>
+        <button type="submit" class="btn btn-success" style="width:100%;">Save Changes</button>
+        <a href="{% url 'assignment_manage' course.id %}" class="btn btn-outline" style="width:100%;margin-top:10px;">Cancel</a>
+    </form>
+</div>
+{% endblock %}

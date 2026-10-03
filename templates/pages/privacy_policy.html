@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block title %}Privacy Policy - Ucyaegis Training{% endblock %}
+{% block content %}
+<div class="container legal">
+    {% include 'pages/_legal_nav.html' with tab='privacy' %}
+    <article class="legal-doc">
+        <h1>Privacy Policy</h1>
+        <p class="updated">Last updated: 3 October 2026</p>
+
+        <p>Ucyaegis Training ("we", "us") respects your privacy. This policy explains what information we collect when you use our website and how we use and protect it.</p>
+
+        <h2>1. Information we collect</h2>
+        <ul>
+            <li><strong>Account details:</strong> your name, username, email address and password (stored in encrypted/hashed form).</li>
+            <li><strong>Learning activity:</strong> courses you enroll in, lectures you complete, assignment answers, questions you ask, and certificates issued to you.</li>
+            <li><strong>Payment details:</strong> the amount, course and Transaction ID of your payment. Payments are processed by Razorpay; we <strong>do not</strong> store your card, bank or UPI credentials.</li>
+        </ul>
+
+        <h2>2. How we use your information</h2>
+        <ul>
+            <li>To create and manage your account and give you access to courses.</li>
+            <li>To track your progress and issue and verify certificates.</li>
+            <li>To process payments and prevent fraud.</li>
+            <li>To answer your questions and provide support.</li>
+        </ul>
+
+        <h2>3. Sharing of information</h2>
+        <p>We do not sell your personal information. We share data only with service providers that are needed to run the platform (for example, our payment gateway Razorpay) or when required by law. A certificate's Credential ID, course name and holder name can be checked by anyone using our "Verify Certificate" page.</p>
+
+        <h2>4. Cookies</h2>
+        <p>We use essential cookies to keep you logged in and to keep the website secure (session and CSRF cookies). We do not use advertising cookies.</p>
+
+        <h2>5. Data security</h2>
+        <p>We take reasonable technical and organisational steps to protect your information. However, no method of transmission over the internet is completely secure.</p>
+
+        <h2>6. Your choices &amp; deleting your account</h2>
+        <p>You can update your profile at any time. Students can permanently delete their account from the <strong>Profile</strong> page; this removes your account, progress, submissions and certificates.</p>
+
+        <h2>7. Changes to this policy</h2>
+        <p>We may update this policy from time to time. The latest version will always be shown on this page.</p>
+
+        <p class="legal-contact">Questions about your data? <a href="{% url 'contact' %}">Contact us</a>.</p>
+    </article>
+</div>
+{% endblock %}

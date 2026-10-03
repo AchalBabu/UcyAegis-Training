@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% block title %}
+My Certificates
+{% endblock %}
+
+{% block content %}
+
+<div class="container">
+
+    <h2 class="section-title">
+        My Certificates
+    </h2>
+
+
+    {% for certificate in certificates %}
+
+    <div
+        style="
+        background:white;
+        border:1px solid #e5e7eb;
+        border-radius:14px;
+        padding:25px;
+        margin-bottom:18px;
+        box-shadow:0 2px 10px rgba(0,0,0,.06);
+        "
+    >
+
+        <h3 style="color:var(--navy);">
+            🎓 {{ certificate.course.title }}
+        </h3>
+
+        <p>
+            <strong>Student:</strong>
+            {{ certificate.student.get_full_name|default:certificate.student.username }}
+        </p>
+
+        <p>
+            <strong>Issued:</strong>
+            {{ certificate.issued_at|date:"d M Y" }}
+        </p>
+
+        <p>
+            <strong>Credential ID:</strong>
+
+            <code>
+                {{ certificate.credential_id }}
+            </code>
+        </p>
+
+
+        {% if certificate.certificate_file %}
+
+        <a
+            href="{{ certificate.certificate_file.url }}"
+            target="_blank"
+            class="btn btn-success"
+        >
+            Open Certificate File
+        </a>
+
+        {% endif %}
+
+
+        <a
+            href="{% url 'verify_credential' %}?credential={{ certificate.credential_id }}"
+            class="btn btn-outline"
+        >
+            Verify Credential
+        </a>
+
+    </div>
+
+    {% empty %}
+
+    <div class="msg warning">
+
+        No certificates yet.
+
+        Complete all required lectures
+        and assignments.
+
+    </div>
+
+    {% endfor %}
+
+</div>
+
+{% endblock %}
