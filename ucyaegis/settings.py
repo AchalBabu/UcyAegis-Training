@@ -57,12 +57,17 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'ucyaegis.wsgi.application'
 
+import os
+import dj_database_url
+
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    "default": dj_database_url.config(
+        default=os.environ.get("DATABASE_URL")
+    )
 }
+
+print("DATABASE ENGINE:", DATABASES["default"]["ENGINE"])
+print("DATABASE NAME:", DATABASES["default"]["NAME"])
 
 AUTH_USER_MODEL = 'accounts.User'
 
